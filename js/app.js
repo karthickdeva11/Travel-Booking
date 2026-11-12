@@ -281,37 +281,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateGuestDisplay();
 
-    // Hero Search Button Click
+    // Hero Search Button & Form Submission with Validation
+    const heroForm = document.getElementById("hero-search-form");
+
+    function executeHeroSearch(e) {
+      if (e) e.preventDefault();
+      if (!validateDates()) {
+        showToast("Please select a valid check-in and check-out date.", "warning");
+        return;
+      }
+
+      const inDate = new Date(checkinInput.value);
+      const outDate = new Date(checkoutInput.value);
+      const nights = Math.max(1, Math.round((outDate - inDate) / (1000 * 60 * 60 * 24)));
+      const destText = destinationSelect.options[destinationSelect.selectedIndex]?.text || "Selected Destination";
+
+      showToast(`Searching luxury availability in ${destText} for ${nights} night(s)... Redirecting...`, "info");
+      setTimeout(() => {
+        window.location.href = "404.html";
+      }, 500);
+    }
+
     if (searchBtn) {
-      searchBtn.addEventListener("click", () => {
-        if (!validateDates()) {
-          showToast("Please select a valid check-out date.", "warning");
-          return;
-        }
-
-        const selectedDest = destinationSelect.value;
-        const hotelDestSelect = document.getElementById("hotel-dest-select");
-
-        // Sync destination filter in hotels section
-        if (hotelDestSelect) {
-          hotelDestSelect.value = selectedDest;
-          AppState.hotelFilters.destinationId = selectedDest;
-          applyHotelFilters();
-        }
-
-        // Calculate nights
-        const inDate = new Date(checkinInput.value);
-        const outDate = new Date(checkoutInput.value);
-        const nights = Math.max(1, Math.round((outDate - inDate) / (1000 * 60 * 60 * 24)));
-
-        // Scroll smoothly to hotel section
-        const hotelsSection = document.getElementById("hotels");
-        if (hotelsSection) {
-          hotelsSection.scrollIntoView({ behavior: "smooth" });
-        }
-
-        showToast(`Searching stays for ${nights} night(s) & ${AppState.guestConfig.rooms} room(s)...`, "info");
-      });
+      searchBtn.addEventListener("click", executeHeroSearch);
+    }
+    if (heroForm) {
+      heroForm.addEventListener("submit", executeHeroSearch);
     }
   }
 
@@ -494,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="dest-content">
             <div class="dest-header-row">
-              <h3 class="dest-name">${dest.name}</h3>
+              <h3 class="dest-name"><a href="404.html" style="color: inherit; text-decoration: none;">${dest.name}</a></h3>
             </div>
             <div class="dest-country">
               <i class="fa-solid fa-location-dot"></i> ${dest.country}
@@ -505,9 +500,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="dest-price-label">Avg. from</span>
                 <span class="dest-price-value">$${dest.avgPrice}<small style="font-size:0.75rem; font-weight:500; color:var(--text-muted);">/night</small></span>
               </div>
-              <button class="dest-explore-btn" onclick="filterByDestinationDirect('${dest.id}')">
+              <a href="404.html" class="dest-explore-btn">
                 Explore Stays <i class="fa-solid fa-arrow-right"></i>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -758,7 +753,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <small style="color:var(--text-muted); font-weight:500;">(${hotel.reviewsCount})</small>
               </div>
             </div>
-            <h3 class="hotel-name">${hotel.name}</h3>
+            <h3 class="hotel-name"><a href="404.html" style="color: inherit; text-decoration: none;">${hotel.name}</a></h3>
             <p class="hotel-description">${hotel.description}</p>
             <div class="hotel-amenities-tags">
               ${hotel.amenities.slice(0, 4).map(am => `
@@ -827,6 +822,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="offer-expiry">
             <i class="fa-regular fa-clock"></i> ${offer.expiryDate}
           </div>
+          <a href="404.html" class="offer-details-link" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-weight: 700; color: var(--accent); font-size: 0.9rem; text-decoration: none;">
+            Claim Offer & Details <i class="fa-solid fa-arrow-right"></i>
+          </a>
         </div>
       </div>
     `).join("");
@@ -1046,7 +1044,10 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("wanderlux_subscribers", JSON.stringify(subscribers));
       }
 
-      showToast("Subscription successful! Use promo code WELCOME50 for $50 off.", "success");
+      showToast("Subscription successful! Redirecting to exclusive offers...", "success");
+      setTimeout(() => {
+        window.location.href = "404.html";
+      }, 600);
     });
   }
 
@@ -1291,7 +1292,10 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("wanderlux_bookings", JSON.stringify(bookings));
 
         closeBookingEstimatorModal();
-        showToast(`🎉 Reservation confirmed! Booking Ref #${refId} for ${AppState.currentHotelForBooking.name} (${totalFormatted}).`, "success");
+        showToast(`🎉 Reservation confirmed! Booking Ref #${refId} for ${AppState.currentHotelForBooking.name} (${totalFormatted}). Redirecting...`, "success");
+        setTimeout(() => {
+          window.location.href = "404.html";
+        }, 600);
       });
     }
   }
@@ -1650,7 +1654,10 @@ document.addEventListener("DOMContentLoaded", () => {
         updateUserAuthUI();
         closeLoginModal();
 
-        showToast(isSignUp ? `🎉 Welcome to WanderLux, ${userData.name}!` : `👋 Welcome back, ${userData.name}!`, "success");
+        showToast(isSignUp ? `🎉 Welcome to WanderLux, ${userData.name}! Redirecting...` : `👋 Welcome back, ${userData.name}! Redirecting...`, "success");
+        setTimeout(() => {
+          window.location.href = "404.html";
+        }, 600);
       });
     }
 
@@ -1663,7 +1670,10 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("wanderlux_user", JSON.stringify(userData));
       updateUserAuthUI();
       closeLoginModal();
-      showToast(`Signed in successfully with ${provider}!`, "success");
+      showToast(`Signed in successfully with ${provider}! Redirecting...`, "success");
+      setTimeout(() => {
+        window.location.href = "404.html";
+      }, 600);
     }
 
     if (socialGoogle) socialGoogle.addEventListener("click", () => simulateSocialLogin("Google"));
@@ -1680,7 +1690,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================================
-     Contact Form Handler
+     Contact Form Handler with Comprehensive Validation & 404 Redirection
      ========================================================================== */
   function initContactForm() {
     const contactForm = document.getElementById("contact-form");
@@ -1688,27 +1698,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
     contactForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const name = document.getElementById("contact-name")?.value.trim();
-      const email = document.getElementById("contact-email")?.value.trim();
-      const message = document.getElementById("contact-message")?.value.trim();
+      const nameInput = document.getElementById("contact-name");
+      const emailInput = document.getElementById("contact-email");
+      const phoneInput = document.getElementById("contact-phone");
+      const messageInput = document.getElementById("contact-message");
+
+      const name = nameInput ? nameInput.value.trim() : "";
+      const email = emailInput ? emailInput.value.trim() : "";
+      const phone = phoneInput ? phoneInput.value.trim() : "";
+      const message = messageInput ? messageInput.value.trim() : "";
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{6,15}$/;
 
-      if (!name) {
-        showToast("Please enter your full name.", "warning");
+      if (!name || name.length < 2) {
+        showToast("Please enter your full name (minimum 2 characters).", "warning");
+        if (nameInput) nameInput.focus();
         return;
       }
       if (!email || !emailRegex.test(email)) {
         showToast("Please enter a valid email address.", "warning");
+        if (emailInput) emailInput.focus();
         return;
       }
-      if (!message) {
-        showToast("Please enter your travel vision or message.", "warning");
+      if (phone && !phoneRegex.test(phone.replace(/\s+/g, ""))) {
+        showToast("Please provide a valid phone number format.", "warning");
+        if (phoneInput) phoneInput.focus();
+        return;
+      }
+      if (!message || message.length < 8) {
+        showToast("Please share your travel vision or inquiry (at least 8 characters).", "warning");
+        if (messageInput) messageInput.focus();
         return;
       }
 
-      showToast(`Thank you, ${name}! Your inquiry has been sent to our VIP Concierge team.`, "success");
+      showToast(`Thank you, ${name}! Your inquiry has been validated and sent to our VIP Concierge team. Redirecting...`, "success");
       contactForm.reset();
+      setTimeout(() => {
+        window.location.href = "404.html";
+      }, 600);
     });
   }
 
@@ -1885,4 +1913,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
+
+  /* ==========================================================================
+     Global Link Redirection to Custom 404 (Except Navbar & Footer)
+     ========================================================================== */
+  document.addEventListener("click", (e) => {
+    const anchor = e.target.closest("a");
+    if (!anchor) return;
+
+    // Strictly protect navbar, mobile nav drawer overlay, and footer links
+    if (
+      anchor.closest(".navbar") || 
+      anchor.closest(".mobile-nav-drawer") || 
+      anchor.closest(".mobile-nav-overlay") || 
+      anchor.closest("footer") || 
+      anchor.closest(".footer")
+    ) {
+      return;
+    }
+
+    // Direct all other site links to the custom 404 page
+    e.preventDefault();
+    window.location.href = "404.html";
+  });
 });
